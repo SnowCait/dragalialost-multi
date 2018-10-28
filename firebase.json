@@ -12,6 +12,14 @@
         "function": "createRoom"
       },
       {
+        "source": "/subscribeQuest",
+        "function": "subscribeQuest"
+      },
+      {
+        "source": "/unsubscribeQuest",
+        "function": "unsubscribeQuest"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
