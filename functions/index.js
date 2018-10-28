@@ -3,6 +3,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
+const messaging = admin.messaging();
 
 exports.createRoom = functions.https.onRequest((req, res) => {
   const registrationToken = '';
@@ -13,11 +14,12 @@ exports.createRoom = functions.https.onRequest((req, res) => {
     },
     token: registrationToken
   };
-  admin.messaging().send(payload)
+  messaging.send(payload)
   .then((response) => {
     console.log('Success to send message.', response);
   })
   .catch((error) => {
     console.error('Failed to send message.', error)
   });
+  return res.status(204).send();
 });
