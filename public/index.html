@@ -82,6 +82,7 @@
         // - the user clicks on an app notification created by a service worker
         //   `messaging.setBackgroundMessageHandler` handler.
         const messaging = firebase.messaging();
+        messaging.usePublicVapidKey("BCstc5l3ABmimlG2cQNjYTvcEGNSYhSfyWF0V8INr85Zz10CuPycJLnDNDdN4kH-AjIphAu57Bwt-RaMH4vFKNA");
         messaging.onMessage(function (payload) {
           console.log('Message received. ', payload);
           // [START_EXCLUDE]
