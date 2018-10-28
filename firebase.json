@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/createRoom",
+        "function": "createRoom"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
