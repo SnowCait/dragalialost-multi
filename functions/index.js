@@ -9,16 +9,22 @@ admin.initializeApp({
 const messaging = admin.messaging();
 
 exports.createRoom = functions.https.onRequest((req, res) => {
-  const topic = 'test-topic-1';
-  const payload = {
-    notification: {
-      title: 'TITLE',
-      body: 'BODY'
+  const topic = req.body.topic;
+  const roomId = req.body.roomId;
+  const message = {
+    // notification: {
+    //   title: topic,
+    //   body: roomId
+    // },
+    data: {
+      quest: topic,
+      roomId: `${roomId}`,
+      might: '0'
     },
     topic: topic
   };
   
-  messaging.send(payload)
+  messaging.send(message)
   .then((response) => {
     console.log('Success to send message.', response);
   })
@@ -26,14 +32,14 @@ exports.createRoom = functions.https.onRequest((req, res) => {
     console.error('Failed to send message.', error);
   });
   
-  return res.status(200).send();
+  return res.status(200).end();
 });
 
 exports.subscribeQuest = functions.https.onRequest((req, res) => {
-  const registrationToken = '';
-  const topic = 'test-topic-1';
+  const userToken = req.body.token;
+  const topic = req.body.topic;
   
-  messaging.subscribeToTopic(registrationToken, topic)
+  messaging.subscribeToTopic(userToken, topic)
     .then((response) => {
       console.log('Successfully subscribed to topic.', response);
     })
@@ -41,14 +47,14 @@ exports.subscribeQuest = functions.https.onRequest((req, res) => {
       console.error('Error subscribing to topic.', error);
     });
   
-  return res.status(200).send();
+  return res.status(200).end();
 });
 
 exports.unsubscribeQuest = functions.https.onRequest((req, res) => {
-  const registrationToken = '';
-  const topic = 'test-topic-1';
+  const userToken = req.body.token;
+  const topic = req.body.topic;
   
-  messaging.unsubscribeFromTopic(registrationToken, topic)
+  messaging.unsubscribeFromTopic(userToken, topic)
     .then((response) => {
       console.log('Successfully unsubscribed from topic.', response);
     })
@@ -56,5 +62,5 @@ exports.unsubscribeQuest = functions.https.onRequest((req, res) => {
       console.error('Error unsubscribing from topic.', error);
     });
   
-    return res.status(200).send();
+    return res.status(200).end();
 });

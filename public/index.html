@@ -47,6 +47,24 @@
       <button id="enable-push-messaging" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
         Enable Push Messaging
       </button>
+      
+      <form method="POST" action="/subscribeQuest">
+        <input type="hidden" name="token" class="token" />
+        <input type="text" name="topic" value="test-topic-1" />
+        <input type="submit" value="購読" />
+      </form>
+      
+      <form method="POST" action="/unsubscribeQuest">
+        <input type="hidden" name="token" class="token" />
+        <input type="text" name="topic" value="test-topic-1" />
+        <input type="submit" value="解除" />
+      </form>
+
+      <form method="POST" action="/createRoom">
+        <input type="text" name="topic" value="test-topic-1" />
+        <input type="number" name="roomId" value="1234567" />
+        <input type="submit" value="ルーム作成" />
+      </form>
     </main>
 
     <script>
@@ -121,6 +139,9 @@
           messaging.getToken()
           .then(function (currentToken) {
             console.log('[requestPermission] Token refreshed.', currentToken);
+            document.querySelectorAll('.token').forEach((element, key, parent) => {
+              element.value = currentToken;
+            });
             // if (currentToken) {
             //   sendTokenToServer(currentToken);
             //   updateUIForPushEnabled(currentToken);
