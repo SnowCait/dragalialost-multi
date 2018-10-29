@@ -68,6 +68,8 @@
         <input type="number" name="roomId" value="1234567" />
         <input type="submit" value="ルーム作成" />
       </form>
+
+      <ul id="room-list"></ul>
     </main>
 
     <script>
@@ -131,6 +133,27 @@
           // Update the UI to include the received message.
           // appendMessage(payload);
           // [END_EXCLUDE]
+
+          function createRoomElement(json) {
+            const li = document.createElement('li');
+            li.insertAdjacentHTML(
+              'afterbegin',
+              `<article><h1>${json.quest}</h1><p>[${json.roomId}] ${json.element}-${json.might}</p></article>`
+              );
+            return li;
+          }
+
+          // Add list
+          const ul = document.getElementById('room-list');
+          const li = createRoomElement(payload.data);
+          ul.insertBefore(li, ul.firstChild);
+
+          // Notification
+          var title = `Frontend ${payload.data.quest}`;
+          var options = {
+            body: payload.data.roomId
+          };
+          new Notification(title, options);
         });
         // Callback fired if Instance ID token is updated.
         messaging.onTokenRefresh(function () {
