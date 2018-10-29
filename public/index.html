@@ -16,6 +16,9 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
+    <!-- for Ajax -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
@@ -48,19 +51,19 @@
         Enable Push Messaging
       </button>
       
-      <form method="POST" action="/subscribeQuest">
+      <form method="POST" action="/subscribeQuest" class="ajax-form">
         <input type="hidden" name="token" class="token" />
         <input type="text" name="topic" value="test-topic-1" />
         <input type="submit" value="購読" />
       </form>
       
-      <form method="POST" action="/unsubscribeQuest">
+      <form method="POST" action="/unsubscribeQuest" class="ajax-form">
         <input type="hidden" name="token" class="token" />
         <input type="text" name="topic" value="test-topic-1" />
         <input type="submit" value="解除" />
       </form>
 
-      <form method="POST" action="/createRoom">
+      <form method="POST" action="/createRoom" class="ajax-form">
         <input type="text" name="topic" value="test-topic-1" />
         <input type="number" name="roomId" value="1234567" />
         <input type="submit" value="ルーム作成" />
@@ -88,11 +91,32 @@
           document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
         }
         
+        // UI
         const pushButton = document.querySelector('#enable-push-messaging');
         pushButton.addEventListener('click', function () {
           pushButton.disabled = true;
           requestPermission();
           pushButton.disabled = false;
+        });
+
+        document.querySelectorAll('.ajax-form').forEach((form) => {
+          form.addEventListener('submit', (event) => {
+            console.log('Request Ajax.', form);
+            event.preventDefault();
+            const $form = $(form);
+            $.ajax({
+              method: form.method,
+              url: form.action,
+              data: $form.serialize(),
+              dataType: 'text'
+            })
+            .then((data) => {
+              console.log('Success Ajax.', data);
+            })
+            .catch((error) => {
+              console.log('Failed Ajax.', error);
+            });
+          });
         });
 
         // Handle incoming messages. Called when:
