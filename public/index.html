@@ -48,28 +48,37 @@
     </header>
     <main>
       <section id="requestPermission" hidden>
+        <h2>始めに</h2>
+        <p>ブラウザの通知を有効にする必要があります。</p>
         <button id="enable-push-messaging" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-          Enable Push Messaging
+          通知を有効にする
         </button>
       </section>
 
       <section id="unblockPermission" hidden>
-        <p>Please permit Notification from address bar.</p>
+        <p>通知がブロックされています。アドレスバーのサイト情報から通知を有効にしてください。</p>
       </section>
       
       <section id="contents" hidden>
-        <form method="POST" action="/subscribeQuest" class="ajax-form">
-          <input type="hidden" name="token" class="token" />
-          <input type="text" name="topic" value="test-topic-1" />
-          <input type="submit" value="購読" />
-        </form>
-        
-        <form method="POST" action="/unsubscribeQuest" class="ajax-form">
-          <input type="hidden" name="token" class="token" />
-          <input type="text" name="topic" value="test-topic-1" />
-          <input type="submit" value="解除" />
+        <h2>通知を受け取るクエスト</h2>
+        <form method="POST" id="subscribeQuests">
+          <!-- TODO: generate from JS -->
+          <!-- Beginner Standard Expert Master -->
+          <label>
+            <input type="checkbox" name="topic" value="test-topic-1" />レイド 初級
+          </label>
+          <label>
+            <input type="checkbox" name="topic" value="test-topic-2" />レイド 中級
+          </label>
+          <label>
+            <input type="checkbox" name="topic" value="test-topic-3" />レイド 上級
+          </label>
+          <label>
+            <input type="checkbox" name="topic" value="test-topic-4" />レイド EX
+          </label>
         </form>
 
+        <h2>募集する</h2>
         <form method="POST" action="/createRoom" class="ajax-form">
           <input type="text" name="topic" value="test-topic-1" />
           <input type="number" name="roomId" value="1234567" />
@@ -81,6 +90,7 @@
     </main>
 
     <script>
+      let userToken;
       document.addEventListener('DOMContentLoaded', function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
@@ -105,20 +115,36 @@
         document.getElementById('enable-push-messaging').addEventListener('click', requestPermission);
         document.querySelectorAll('.ajax-form').forEach((form) => {
           form.addEventListener('submit', (event) => {
-            console.log('Request Ajax.', form);
             event.preventDefault();
             const $form = $(form);
-            $.ajax({
+            sendRequest({
               method: form.method,
               url: form.action,
               data: $form.serialize(),
               dataType: 'text'
-            })
-            .then((data) => {
-              console.log('Success Ajax.', data);
-            })
-            .catch((error) => {
-              console.log('Failed Ajax.', error);
+            });
+          });
+        });
+        document.querySelectorAll('#subscribeQuests input[name="topic"]').forEach((checkbox, key, parent) => {
+          const form = document.getElementById('subscribeQuests');
+          checkbox.addEventListener('change', () => {
+            // なぜか JSON だとエラーになる
+            // const data = {
+            //   token: userToken,
+            //   topic: checkbox.value
+            // };
+            // sendRequest({
+            //   method: 'post',
+            //   url: form.action + (checkbox.checked ? 'subscribeQuest' : 'unsubscribeQuest'),
+            //   data: JSON.stringify(data),
+            //   dataType: 'json',
+            //   contentType: 'application/json'
+            // });
+            sendRequest({
+              method: form.method,
+              url: form.action + (checkbox.checked ? 'subscribeQuest' : 'unsubscribeQuest'),
+              data: `token=${userToken}&topic=${checkbox.value}`,
+              dataType: 'text'
             });
           });
         });
@@ -148,6 +174,17 @@
 
         getTokenAndUpdateUI();
       });
+
+      function sendRequest(settings) {
+        console.log('Request sended.', settings);
+        $.ajax(settings)
+          .then((data) => {
+            console.log('Request success.', data);
+          })
+          .catch((error) => {
+            console.error('Request failed.', error);
+          });
+      }
 
       function requestPermission() {
         console.log('Requesting permission...');
@@ -185,6 +222,7 @@
               document.querySelectorAll('.token').forEach((element, key, parent) => {
                 element.value = token;
               });
+              userToken = token;
             } else {
               // Show permission request.
               console.log('No Instance ID token available. Request permission to generate one.');
