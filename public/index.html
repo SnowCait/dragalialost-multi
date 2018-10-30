@@ -67,7 +67,7 @@
 
         <h2>募集する</h2>
         <form method="POST" action="/createRoom" class="ajax-form">
-          <input type="text" name="topic" value="test-topic-1" />
+          <select name="topic" id="roomTopic"></select>
           <input type="number" name="roomId" value="1234567" />
           <input type="submit" value="ルーム作成" />
         </form>
@@ -246,6 +246,23 @@
               dataType: 'text'
             });
           });
+        });
+
+        const selectOfTopic = document.getElementById('roomTopic');
+        questsMaster.forEach((group) => {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = group.name;
+          group.quests.forEach((quest) => {
+            quest.levels.forEach((level) => {
+              const topic = `${group.id}-${quest.element}-${level}`;
+              const name = `${quest.name} ${levelsMaster[level]}`;
+              const optionOfTopic = document.createElement('option');
+              optionOfTopic.value = topic;
+              optionOfTopic.textContent = name;
+              optgroup.appendChild(optionOfTopic);
+            });
+          });
+          selectOfTopic.appendChild(optgroup);
         });
 
         /// Messaging
