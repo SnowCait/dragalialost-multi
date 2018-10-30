@@ -62,20 +62,7 @@
       <section id="contents" hidden>
         <h2>通知を受け取るクエスト</h2>
         <form method="POST" id="subscribeQuests">
-          <!-- TODO: generate from JS -->
-          <!-- Beginner Standard Expert Master -->
-          <label>
-            <input type="checkbox" name="topic" value="test-topic-1" />レイド 初級
-          </label>
-          <label>
-            <input type="checkbox" name="topic" value="test-topic-2" />レイド 中級
-          </label>
-          <label>
-            <input type="checkbox" name="topic" value="test-topic-3" />レイド 上級
-          </label>
-          <label>
-            <input type="checkbox" name="topic" value="test-topic-4" />レイド EX
-          </label>
+          <table></table>
         </form>
 
         <h2>募集する</h2>
@@ -90,7 +77,83 @@
     </main>
 
     <script>
+      // Master Data
+      const levelsMaster = {
+        beginner: '初級',
+        standard: '中級',
+        expert: '上級',
+        master: '超級',
+        special: 'EX'
+      };
+      const questsMaster = [
+        {
+          id: 'onslaught',
+          name: 'ディアネル帝国迎撃戦',
+          quests: [
+            {
+              element: 'flame',
+              name: 'アドラ火山の戦い',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'water',
+              name: 'ミレージュ湖畔の戦い',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'wind',
+              name: 'ロブレール森林の戦い',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'light',
+              name: 'ドルニトス山脈の戦い',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'shadow',
+              name: 'ワルトアール遺跡の戦い',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            }
+          ]
+        },
+        {
+          id: 'dragon',
+          name: 'ドラゴンの試練',
+          quests: [
+            {
+              element: 'wind',
+              name: 'ミドガルズオルムの試練',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'water',
+              name: 'マーキュリーの試練',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'flame',
+              name: 'ブリュンヒルデの試練',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'light',
+              name: 'ユピテルの試練',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            },
+            {
+              element: 'shadow',
+              name: 'ゾディアークの試練',
+              levels: ['beginner', 'standard', 'expert', 'master',]
+            }
+          ]
+        }
+      ];
+
+      // Variables
       let userToken;
+
+
       document.addEventListener('DOMContentLoaded', function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
@@ -125,6 +188,42 @@
             });
           });
         });
+        
+        const tableOfQuestGroups = document.getElementById('subscribeQuests').getElementsByTagName('table').item(0);
+        questsMaster.forEach((group) => {
+          const tbodyOfQuestGroup = document.createElement('tbody');
+          const trOfQuestGroup = document.createElement('tr');
+          const thOfQeustGroup = document.createElement('th');
+          thOfQeustGroup.colSpan = 5;  // 可変にするべきだがとりあえず固定値
+          thOfQeustGroup.textContent = group.name;
+          trOfQuestGroup.appendChild(thOfQeustGroup);
+          tbodyOfQuestGroup.appendChild(trOfQuestGroup);
+          group.quests.forEach((quest) => {
+            const trOfQuests = document.createElement('tr');
+            const tdOfQuestName = document.createElement('td');
+            tdOfQuestName.textContent = `${quest.name}`;
+            trOfQuests.appendChild(tdOfQuestName);
+            quest.levels.forEach((level) => {
+              const tdOfLevel = document.createElement('td');
+              const label = document.createElement('label');
+              const input = document.createElement('input');
+              const topic = `${group.id}-${quest.element}-${level}`;
+              input.type = 'checkbox';
+              input.name = 'topic';
+              input.value = topic;
+              input.checked = false;  // TODO: 既に購読しているものがあれば true にする
+              const span = document.createElement('span');
+              span.textContent = levelsMaster[level];
+              label.appendChild(input);
+              label.appendChild(span);
+              tdOfLevel.appendChild(label);
+              trOfQuests.appendChild(tdOfLevel);
+            });
+            tbodyOfQuestGroup.appendChild(trOfQuests);
+          });
+          tableOfQuestGroups.appendChild(tbodyOfQuestGroup);
+        });
+
         document.querySelectorAll('#subscribeQuests input[name="topic"]').forEach((checkbox, key, parent) => {
           const form = document.getElementById('subscribeQuests');
           checkbox.addEventListener('change', () => {
