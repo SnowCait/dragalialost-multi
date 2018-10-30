@@ -12,6 +12,7 @@ exports.createRoom = functions.https.onRequest((req, res) => {
   console.log('Requested.', req.url, req.body);
   const topic = req.body.topic;
   const roomId = req.body.roomId;
+  const note = req.body.note;
 
   // Validation
   if (!topic || !roomId) {
@@ -24,10 +25,9 @@ exports.createRoom = functions.https.onRequest((req, res) => {
     //   body: roomId
     // },
     data: {
-      quest: topic,
+      topic: topic,
       roomId: `${roomId}`,
-      element: '0',
-      might: '0'
+      note: note
     },
     topic: topic
   };
