@@ -9,10 +9,10 @@
     <!-- update the version number as needed -->
     <script defer src="/__/firebase/5.5.6/firebase-app.js"></script>
     <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/5.5.6/firebase-auth.js"></script>
-    <script defer src="/__/firebase/5.5.6/firebase-database.js"></script>
+    <!-- <script defer src="/__/firebase/5.5.6/firebase-auth.js"></script> -->
+    <!-- <script defer src="/__/firebase/5.5.6/firebase-database.js"></script> -->
     <script defer src="/__/firebase/5.5.6/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/5.5.6/firebase-storage.js"></script>
+    <!-- <script defer src="/__/firebase/5.5.6/firebase-storage.js"></script> -->
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
@@ -47,29 +47,37 @@
       <h1>ドラガリマルチ募集</h1>
     </header>
     <main>
-      <button id="enable-push-messaging" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-        Enable Push Messaging
-      </button>
-      
-      <form method="POST" action="/subscribeQuest" class="ajax-form">
-        <input type="hidden" name="token" class="token" />
-        <input type="text" name="topic" value="test-topic-1" />
-        <input type="submit" value="購読" />
-      </form>
-      
-      <form method="POST" action="/unsubscribeQuest" class="ajax-form">
-        <input type="hidden" name="token" class="token" />
-        <input type="text" name="topic" value="test-topic-1" />
-        <input type="submit" value="解除" />
-      </form>
+      <section id="requestPermission" hidden>
+        <button id="enable-push-messaging" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+          Enable Push Messaging
+        </button>
+      </section>
 
-      <form method="POST" action="/createRoom" class="ajax-form">
-        <input type="text" name="topic" value="test-topic-1" />
-        <input type="number" name="roomId" value="1234567" />
-        <input type="submit" value="ルーム作成" />
-      </form>
+      <section id="unblockPermission" hidden>
+        <p>Please permit Notification from address bar.</p>
+      </section>
+      
+      <section id="contents" hidden>
+        <form method="POST" action="/subscribeQuest" class="ajax-form">
+          <input type="hidden" name="token" class="token" />
+          <input type="text" name="topic" value="test-topic-1" />
+          <input type="submit" value="購読" />
+        </form>
+        
+        <form method="POST" action="/unsubscribeQuest" class="ajax-form">
+          <input type="hidden" name="token" class="token" />
+          <input type="text" name="topic" value="test-topic-1" />
+          <input type="submit" value="解除" />
+        </form>
 
-      <ul id="room-list"></ul>
+        <form method="POST" action="/createRoom" class="ajax-form">
+          <input type="text" name="topic" value="test-topic-1" />
+          <input type="number" name="roomId" value="1234567" />
+          <input type="submit" value="ルーム作成" />
+        </form>
+
+        <ul id="room-list"></ul>
+      </section>
     </main>
 
     <script>
@@ -93,14 +101,8 @@
           document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
         }
         
-        // UI
-        const pushButton = document.querySelector('#enable-push-messaging');
-        pushButton.addEventListener('click', function () {
-          pushButton.disabled = true;
-          requestPermission();
-          pushButton.disabled = false;
-        });
-
+        /// UI
+        document.getElementById('enable-push-messaging').addEventListener('click', requestPermission);
         document.querySelectorAll('.ajax-form').forEach((form) => {
           form.addEventListener('submit', (event) => {
             console.log('Request Ajax.', form);
@@ -121,96 +123,119 @@
           });
         });
 
+        /// Messaging
+        const messaging = firebase.messaging();
+        messaging.usePublicVapidKey("BCstc5l3ABmimlG2cQNjYTvcEGNSYhSfyWF0V8INr85Zz10CuPycJLnDNDdN4kH-AjIphAu57Bwt-RaMH4vFKNA");
+
         // Handle incoming messages. Called when:
         // - a message is received while the app has focus
         // - the user clicks on an app notification created by a service worker
         //   `messaging.setBackgroundMessageHandler` handler.
-        const messaging = firebase.messaging();
-        messaging.usePublicVapidKey("BCstc5l3ABmimlG2cQNjYTvcEGNSYhSfyWF0V8INr85Zz10CuPycJLnDNDdN4kH-AjIphAu57Bwt-RaMH4vFKNA");
         messaging.onMessage(function (payload) {
           console.log('Message received. ', payload);
-          // [START_EXCLUDE]
+
           // Update the UI to include the received message.
-          // appendMessage(payload);
-          // [END_EXCLUDE]
-
-          function createRoomElement(json) {
-            const li = document.createElement('li');
-            li.insertAdjacentHTML(
-              'afterbegin',
-              `<article><h1>${json.quest}</h1><p>[${json.roomId}] ${json.element}-${json.might}</p></article>`
-              );
-            return li;
-          }
-
-          // Add list
-          const ul = document.getElementById('room-list');
-          const li = createRoomElement(payload.data);
-          ul.insertBefore(li, ul.firstChild);
+          appendMessage(payload);
 
           // Notification
-          var title = `Frontend ${payload.data.quest}`;
-          var options = {
-            body: payload.data.roomId
-          };
-          new Notification(title, options);
+          showNotification(payload);
         });
+
         // Callback fired if Instance ID token is updated.
         messaging.onTokenRefresh(function () {
-          messaging.getToken()
-          .then(function (refreshedToken) {
-            console.log('[onTokenRefresh] Token refreshed.', refreshedToken);
-            // Indicate that the new Instance ID token has not yet been sent to the
-            // app server.
-            // setTokenSentToServer(false);
-            // // Send Instance ID token to app server.
-            // sendTokenToServer(refreshedToken);
-            // // ...
-          })
-          .catch(function (err) {
-            console.log('Unable to retrieve refreshed token ', err);
-            // showToken('Unable to retrieve refreshed token ', err);
-          });
+          getTokenAndUpdateUI();
         });
+
+        getTokenAndUpdateUI();
       });
 
       function requestPermission() {
         console.log('Requesting permission...');
-        // [START request_permission]
         const messaging = firebase.messaging();
         messaging.requestPermission()
         .then(function () {
           console.log('Notification permission granted.');
-
-          // TODO: メソッド切り出し
-          messaging.getToken()
-          .then(function (currentToken) {
-            console.log('[requestPermission] Token refreshed.', currentToken);
-            document.querySelectorAll('.token').forEach((element, key, parent) => {
-              element.value = currentToken;
-            });
-            // if (currentToken) {
-            //   sendTokenToServer(currentToken);
-            //   updateUIForPushEnabled(currentToken);
-            // } else {
-            //   // Show permission request.
-            //   console.log('No Instance ID token available. Request permission to generate one.');
-            //   // Show permission UI.
-            //   updateUIForPushPermissionRequired();
-            //   setTokenSentToServer(false);
-            // }
-          })
-          .catch(function (err) {
-            console.log('An error occurred while retrieving token. ', err);
-            // showToken('Error retrieving Instance ID token. ', err);
-            // setTokenSentToServer(false);
-          });
+          getTokenAndUpdateUI();
         })
         .catch(function (err) {
-          console.log('Unable to get permission to notify.', err);
+          switch(err.code) {
+            case 'messaging/permission-default':
+            case 'messaging/notifications-blocked':
+              console.log('Unable to get permission to notify.', err);
+              console.log(err.message);
+              console.warn('Please permit Notification.');
+              document.getElementById('requestPermission').hidden = true;
+              document.getElementById('unblockPermission').hidden = false;
+              break;
+            default:
+              console.error('An error occurred while requesting permission.', err);
+              break;
+          }
         });
-        // [END request_permission]
       }
+
+      function getTokenAndUpdateUI() {
+        const messaging = firebase.messaging();
+        messaging.getToken()
+          .then(function (token) {
+            console.log('Get Token.', token);
+            if (token) {
+              document.getElementById('requestPermission').hidden = true;
+              document.getElementById('contents').hidden = false;
+              document.querySelectorAll('.token').forEach((element, key, parent) => {
+                element.value = token;
+              });
+            } else {
+              // Show permission request.
+              console.log('No Instance ID token available. Request permission to generate one.');
+              // Show permission UI.
+              document.getElementById('requestPermission').hidden = false;
+            }
+          })
+          .catch(function (err) {
+            if (err.code == 'messaging/notifications-blocked') {
+              // TODO: Show Explain about Permission
+              console.log('Unable to get permission to notify.', err);
+              console.warn('Please permit Notification.');
+              document.getElementById('requestPermission').hidden = true;
+              document.getElementById('unblockPermission').hidden = false;
+            } else {
+              console.error('An error occurred while retrieving token.', err);
+              document.getElementById('requestPermission').hidden = true;
+            }
+          });
+      }
+
+      function appendMessage(payload) {
+        const ul = document.getElementById('room-list');
+        const li = createRoomElement(payload.data);
+        ul.insertBefore(li, ul.firstChild);
+      }
+
+      function createRoomElement(json) {
+        const li = document.createElement('li');
+        li.insertAdjacentHTML(
+          'afterbegin',
+          `<article><h1>${json.quest}</h1><p>[${json.roomId}] ${json.element}-${json.might}</p></article>`
+        );
+        return li;
+      }
+
+      function showNotification(payload) {
+        var title = `Frontend ${payload.data.quest}`;
+        var options = {
+          body: payload.data.roomId
+        };
+        new Notification(title, options);
+      }
+
+// Test pattern
+// default -> default
+// default -> granted
+// default -> denied
+// granted
+// denied -> default -> *
+// denied -> granted
     </script>
   </body>
 </html>
