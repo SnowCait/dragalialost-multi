@@ -91,6 +91,13 @@
 
     <script>
       // Master Data
+      const elementsMaster = {
+        flame: '火',
+        water: '水',
+        wind: '風',
+        light: '光',
+        shadow: '闇'
+      };
       const levelsMaster = {
         beginner: '初級',
         standard: '中級',
@@ -289,11 +296,35 @@
         messaging.onMessage(function (payload) {
           console.log('Message received. ', payload);
 
+          const data = payload.data.topic.split('-');
+          console.log(data);
+          const quest = data[0];
+          const element = data[1];
+          const level = data[2];
+          let groupName, questName, elementName, levelName;
+          elementName = elementsMaster[element];
+          levelName = levelsMaster[level];
+          questsMaster.some((group) => {
+            if (group.id == quest) {
+              groupName = group.name;
+              group.quests.some((quest) => {
+                if (quest.element == element) {
+                  questName = quest.name;
+                  return true;
+                }
+              });
+              return true;
+            }
+          });
+          const note = payload.data.note;
+          const roomId = payload.data.roomId;
+          console.log(roomId, groupName, questName, elementName, levelName, note);
+
           // Update the UI to include the received message.
-          appendMessage(payload);
+          appendMessage(roomId, groupName, questName, elementName, levelName, note);
 
           // Notification
-          showNotification(payload);
+          showNotification(roomId, groupName, questName, elementName, levelName, note);
         });
 
         // Callback fired if Instance ID token is updated.
@@ -373,25 +404,30 @@
           });
       }
 
-      function appendMessage(payload) {
+      function appendMessage(roomId, groupName, questName, elementName, levelName, note) {
         const ul = document.getElementById('room-list');
-        const li = createRoomElement(payload.data);
+        const li = document.createElement('li');
+        const article = document.createElement('article');
+        const h1 = document.createElement('h1');
+        h1.textContent = groupName;
+        article.appendChild(h1);
+        const p1 = document.createElement('p');
+        p1.textContent = `${elementName} ${questName} ${levelName}`;
+        article.appendChild(p1);
+        const p2 = document.createElement('p');
+        p2.textContent = roomId;
+        article.appendChild(p2);
+        const p3 = document.createElement('p');
+        p3.textContent = note;
+        article.appendChild(p3);
+        li.appendChild(article);
         ul.insertBefore(li, ul.firstChild);
       }
 
-      function createRoomElement(json) {
-        const li = document.createElement('li');
-        li.insertAdjacentHTML(
-          'afterbegin',
-          `<article><h1>${json.quest}</h1><p>[${json.roomId}] ${json.element}-${json.might}</p></article>`
-        );
-        return li;
-      }
-
-      function showNotification(payload) {
-        var title = `Frontend ${payload.data.quest}`;
+      function showNotification(roomId, groupName, questName, elementName, levelName, note) {
+        var title = 'ドラガリマルチ募集';
         var options = {
-          body: payload.data.roomId
+          body: `${groupName}\n${elementName} ${questName} ${levelName}`
         };
         new Notification(title, options);
       }
