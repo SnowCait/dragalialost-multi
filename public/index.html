@@ -60,11 +60,6 @@
       </section>
       
       <section id="contents" hidden>
-        <h2>通知を受け取るクエスト</h2>
-        <form method="POST" id="subscribeQuests">
-          <table></table>
-        </form>
-
         <h2>募集する</h2>
         <form method="POST" action="/createRoom" class="ajax-form">
           <select name="topic" id="roomTopic"><option>クエスト</option></select>
@@ -74,6 +69,11 @@
         </form>
 
         <ul id="room-list"></ul>
+        
+        <h2>通知を受け取るクエスト</h2>
+        <form method="POST" id="subscribeQuests">
+          <table></table>
+        </form>
       </section>
     </main>
 
