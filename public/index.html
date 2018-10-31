@@ -103,34 +103,57 @@
         standard: '中級',
         expert: '上級',
         master: '超級',
-        special: 'EX'
+        extra: 'EX'
       };
       const questsMaster = [
+          {
+            id: 'kindness',
+            name: '優しき少女と拘囚の守護竜',
+            quests: [
+              {
+                id: 'hypnos',
+                element: 'wind',
+                name: 'ヒュプノス大討伐戦',
+                levels: ['beginner', 'standard', 'expert', 'extra',]
+              },
+              {
+                id: 'stormsentinel',
+                element: 'wind',
+                name: 'ストームストーン討伐戦',
+                levels: ['beginner', 'standard', 'expert',]
+              }
+            ]
+          },
         {
           id: 'onslaught',
           name: 'ディアネル帝国迎撃戦',
           quests: [
             {
+              id: 'adolla',
               element: 'flame',
               name: 'アドラ火山の戦い',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'myriage',
               element: 'water',
               name: 'ミレージュ湖畔の戦い',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'rovetelle',
               element: 'wind',
               name: 'ロブレール森林の戦い',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'dornith',
               element: 'light',
               name: 'ドルニトス山脈の戦い',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'wartarch',
               element: 'shadow',
               name: 'ワルトアール遺跡の戦い',
               levels: ['beginner', 'standard', 'expert', 'master',]
@@ -142,26 +165,31 @@
           name: 'ドラゴンの試練',
           quests: [
             {
+              id: 'midgardsormr',
               element: 'wind',
               name: 'ミドガルズオルムの試練',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'mercury',
               element: 'water',
               name: 'マーキュリーの試練',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'brunhilda',
               element: 'flame',
               name: 'ブリュンヒルデの試練',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'jupiter',
               element: 'light',
               name: 'ユピテルの試練',
               levels: ['beginner', 'standard', 'expert', 'master',]
             },
             {
+              id: 'zodiark',
               element: 'shadow',
               name: 'ゾディアークの試練',
               levels: ['beginner', 'standard', 'expert', 'master',]
@@ -227,7 +255,7 @@
               const tdOfLevel = document.createElement('td');
               const label = document.createElement('label');
               const input = document.createElement('input');
-              const topic = `${group.id}-${quest.element}-${level}`;
+              const topic = `${group.id}-${quest.id}-${level}`;
               input.type = 'checkbox';
               input.name = 'topic';
               input.value = topic;
@@ -274,7 +302,7 @@
           optgroup.label = group.name;
           group.quests.forEach((quest) => {
             quest.levels.forEach((level) => {
-              const topic = `${group.id}-${quest.element}-${level}`;
+              const topic = `${group.id}-${quest.id}-${level}`;
               const name = `${quest.name} ${levelsMaster[level]}`;
               const optionOfTopic = document.createElement('option');
               optionOfTopic.value = topic;
@@ -297,18 +325,18 @@
           console.log('Message received. ', payload);
 
           const data = payload.data.topic.split('-');
-          const quest = data[0];
-          const element = data[1];
+          const groupId = data[0];
+          const questId = data[1];
           const level = data[2];
           let groupName, questName, elementName, levelName;
-          elementName = elementsMaster[element];
           levelName = levelsMaster[level];
           questsMaster.some((group) => {
-            if (group.id == quest) {
+            if (group.id == groupId) {
               groupName = group.name;
               group.quests.some((quest) => {
-                if (quest.element == element) {
+                if (quest.id == questId) {
                   questName = quest.name;
+                  elementName = elementsMaster[quest.element];
                   return true;
                 }
               });
