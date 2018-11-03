@@ -413,8 +413,18 @@
             const topics = JSON.parse(json);
             Object.keys(topics).forEach(topic => {
               const checkbox = document.querySelector(`input[name='topic'][value='${topic}']`);
-              checkbox.checked = true;
-              checkbox.title = `登録日: ${topics[topic].addDate}`;
+              if (checkbox) {
+                checkbox.checked = true;
+                checkbox.title = `登録日: ${topics[topic].addDate}`;
+              } else {
+                // Unsubscribe topics not existing
+                sendRequest({
+                  method: form.method,
+                  url: form.action + 'unsubscribeQuest',
+                  data: `token=${userToken}&topic=${topic}`,
+                  dataType: 'text'
+                });
+              }
             });
           })
           .catch((error) => {
