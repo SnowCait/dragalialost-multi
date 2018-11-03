@@ -345,9 +345,10 @@
           });
           const note = payload.data.note;
           const roomId = payload.data.roomId;
+          const createdAt = new Date(Number(payload.data.createdAt));
 
           // Update the UI to include the received message.
-          appendMessage(roomId, groupName, questName, elementName, levelName, note);
+          appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt);
 
           // Notification
           showNotification(roomId, groupName, questName, elementName, levelName, note);
@@ -430,7 +431,7 @@
           });
       }
 
-      function appendMessage(roomId, groupName, questName, elementName, levelName, note) {
+      function appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt) {
         const ul = document.getElementById('room-list');
         const li = document.createElement('li');
         const article = document.createElement('article');
@@ -446,6 +447,9 @@
         const p3 = document.createElement('p');
         p3.textContent = note;
         article.appendChild(p3);
+        const p4 = document.createElement('p');
+        p4.textContent = `登録: ${createdAt.toLocaleString()}`
+        article.appendChild(p4);
         li.appendChild(article);
         ul.insertBefore(li, ul.firstChild);
       }

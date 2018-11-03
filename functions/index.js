@@ -27,7 +27,8 @@ exports.createRoom = functions.https.onRequest((req, res) => {
     data: {
       topic: topic,
       roomId: `${roomId}`,
-      note: note
+      note: note,
+      createdAt: `${Date.now()}`
     },
     topic: topic
   };
