@@ -398,6 +398,29 @@
         });
       }
 
+      function retrieveSubscribingQuest() {
+        const settings = {
+          method: 'POST',
+          url: 'http://localhost:5000/getSubscribingQuests',
+          data: `token=${userToken}`,
+          dataType: 'text'
+        };
+        console.log('Request sended.', settings);
+        $.ajax(settings)
+          .then(json => {
+            console.log('Request success.', json);
+            const topics = JSON.parse(json);
+            Object.keys(topics).forEach(topic => {
+              const checkbox = document.querySelector(`input[name='topic'][value='${topic}']`);
+              checkbox.checked = true;
+              checkbox.title = `登録日: ${topics[topic].addDate}`;
+            });
+          })
+          .catch((error) => {
+            console.error('Request failed.', error);
+          });
+      }
+
       function getTokenAndUpdateUI() {
         const messaging = firebase.messaging();
         messaging.getToken()
@@ -410,6 +433,8 @@
                 element.value = token;
               });
               userToken = token;
+
+              retrieveSubscribingQuest();
             } else {
               // Show permission request.
               console.log('No Instance ID token available. Request permission to generate one.');

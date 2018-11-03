@@ -12,6 +12,10 @@
         "function": "createRoom"
       },
       {
+        "source": "/getSubscribingQuests",
+        "function": "getSubscribingQuests"
+      },
+      {
         "source": "/subscribeQuest",
         "function": "subscribeQuest"
       },
