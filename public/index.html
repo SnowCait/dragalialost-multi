@@ -399,9 +399,10 @@
       }
 
       function retrieveSubscribingQuest() {
+        const form = document.getElementById('subscribeQuests');
         const settings = {
-          method: 'POST',
-          url: 'http://localhost:5000/getSubscribingQuests',
+          method: form.method,
+          url: form.action + 'getSubscribingQuests',
           data: `token=${userToken}`,
           dataType: 'text'
         };
