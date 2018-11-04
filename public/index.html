@@ -99,6 +99,7 @@
         shadow: '闇'
       };
       const levelsMaster = {
+        none: '',
         beginner: '初級',
         standard: '中級',
         expert: '上級',
@@ -195,6 +196,42 @@
               levels: ['beginner', 'standard', 'expert', 'master',]
             }
           ]
+        },
+        {
+          id: 'highdragon',
+          name: '真ドラゴンの試練',
+          quests: [
+            {
+              id: 'highmidgardsormr',
+              element: 'wind',
+              name: '真ミドガルズオルムの試練',
+              levels: ['none',]
+            },
+            // {
+            //   id: 'highmercury',
+            //   element: 'water',
+            //   name: '真マーキュリーの試練',
+            //   levels: ['none',]
+            // },
+            // {
+            //   id: 'highbrunhilda',
+            //   element: 'flame',
+            //   name: '真ブリュンヒルデの試練',
+            //   levels: ['none',]
+            // },
+            // {
+            //   id: 'highjupiter',
+            //   element: 'light',
+            //   name: '真ユピテルの試練',
+            //   levels: ['none',]
+            // },
+            // {
+            //   id: 'highzodiark',
+            //   element: 'shadow',
+            //   name: '真ゾディアークの試練',
+            //   levels: ['none',]
+            // }
+          ]
         }
       ];
 
@@ -242,7 +279,7 @@
           const tbodyOfQuestGroup = document.createElement('tbody');
           const trOfQuestGroup = document.createElement('tr');
           const thOfQeustGroup = document.createElement('th');
-          thOfQeustGroup.colSpan = 5;  // 可変にするべきだがとりあえず固定値
+          thOfQeustGroup.colSpan = 6;  // 可変にするべきだがとりあえず固定値
           thOfQeustGroup.textContent = group.name;
           trOfQuestGroup.appendChild(thOfQeustGroup);
           tbodyOfQuestGroup.appendChild(trOfQuestGroup);
