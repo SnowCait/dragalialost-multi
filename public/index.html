@@ -52,6 +52,14 @@
       <p>通知が不安定かもしれません。</p> -->
     </header>
     <main>
+      <section id="notSupported">
+        <h2>注意</h2>
+        <p>
+          このブラウザはサポートされていません。
+          PC の Google Chrome 等でお試しください。
+        </p>
+      </section>
+
       <section id="requestPermission" hidden>
         <h2>始めに</h2>
         <p>ブラウザの通知を有効にする必要があります。</p>
@@ -369,6 +377,8 @@
         });
 
         getTokenAndUpdateUI();
+
+        document.getElementById('notSupported').hidden = true;
       });
 
       navigator.serviceWorker.addEventListener('message', event => {
