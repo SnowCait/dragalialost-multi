@@ -488,11 +488,13 @@
         p1.textContent = `${elementName} ${questName} ${levelName}`;
         article.appendChild(p1);
         const p2 = document.createElement('p');
-        p2.textContent = roomId;
+        p2.textContent = `ルームID: ${roomId}`;
         article.appendChild(p2);
-        const p3 = document.createElement('p');
-        p3.textContent = note;
-        article.appendChild(p3);
+        if (note) {
+          const p3 = document.createElement('p');
+          p3.textContent = `備考: ${note}`;
+          article.appendChild(p3);
+        }
         const p4 = document.createElement('p');
         p4.textContent = `登録: ${createdAt.toLocaleString()}`
         article.appendChild(p4);
