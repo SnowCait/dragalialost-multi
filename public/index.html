@@ -323,35 +323,7 @@
         //   `messaging.setBackgroundMessageHandler` handler.
         messaging.onMessage(function (payload) {
           console.log('Message received. ', payload);
-
-          const data = payload.data.topic.split('-');
-          const groupId = data[0];
-          const questId = data[1];
-          const level = data[2];
-          let groupName, questName, elementName, levelName;
-          levelName = levelsMaster[level];
-          questsMaster.some((group) => {
-            if (group.id == groupId) {
-              groupName = group.name;
-              group.quests.some((quest) => {
-                if (quest.id == questId) {
-                  questName = quest.name;
-                  elementName = elementsMaster[quest.element];
-                  return true;
-                }
-              });
-              return true;
-            }
-          });
-          const note = payload.data.note;
-          const roomId = payload.data.roomId;
-          const createdAt = new Date(Number(payload.data.createdAt));
-
-          // Update the UI to include the received message.
-          appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt);
-
-          // Notification
-          showNotification(roomId, groupName, questName, elementName, levelName, note);
+          receiveMessage(payload);
         });
 
         // Callback fired if Instance ID token is updated.
@@ -361,6 +333,44 @@
 
         getTokenAndUpdateUI();
       });
+
+      navigator.serviceWorker.addEventListener('message', event => {
+        console.log('Receive message from service worker.', event);
+        if (event.data.data) {  // フォアグラウンドのときも Firebase からメッセージが飛んでくるのでスキップ（一元化したい）
+          receiveMessage(event.data);
+        }
+      });
+
+      function receiveMessage(payload) {
+        const data = payload.data.topic.split('-');
+        const groupId = data[0];
+        const questId = data[1];
+        const level = data[2];
+        let groupName, questName, elementName, levelName;
+        levelName = levelsMaster[level];
+        questsMaster.some((group) => {
+          if (group.id == groupId) {
+            groupName = group.name;
+            group.quests.some((quest) => {
+              if (quest.id == questId) {
+                questName = quest.name;
+                elementName = elementsMaster[quest.element];
+                return true;
+              }
+            });
+            return true;
+          }
+        });
+        const note = payload.data.note;
+        const roomId = payload.data.roomId;
+        const createdAt = new Date(Number(payload.data.createdAt));
+
+        // Update the UI to include the received message.
+        appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt);
+
+        // Notification
+        showNotification(roomId, groupName, questName, elementName, levelName, note);
+      }
 
       function sendRequest(settings) {
         console.log('Request sended.', settings);
