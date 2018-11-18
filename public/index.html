@@ -19,6 +19,17 @@
     <!-- for Ajax -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+    <!-- Material Design -->
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script defer src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
@@ -78,7 +89,7 @@
           <select name="topic" id="roomTopic"><option>クエスト選択</option></select>
           <input type="number" name="roomId" placeholder="ルームID" />
           <input type="text" name="note" placeholder="備考" />
-          <input type="submit" value="ルーム作成" />
+          <input type="submit" value="ルーム作成" class="mdc-button" />
         </form>
 
         <ul id="room-list"></ul>
@@ -379,6 +390,9 @@
         getTokenAndUpdateUI();
 
         document.getElementById('notSupported').hidden = true;
+
+        // for debug
+        appendMessage('1000000', 'ドラゴンの試練', 'ミドガルズオルムの試練', '風', '超級', 'テスト', '2018-11-05 00:00:00');
       });
 
       navigator.serviceWorker.addEventListener('message', event => {
@@ -528,8 +542,10 @@
         const ul = document.getElementById('room-list');
         const li = document.createElement('li');
         const article = document.createElement('article');
+        article.classList.add('mdc-card');
         const h1 = document.createElement('h1');
         h1.textContent = groupName;
+        h1.classList.add('mdc-card__media-content');
         article.appendChild(h1);
         const p1 = document.createElement('p');
         p1.textContent = `${elementName} ${questName} ${levelName}`;
