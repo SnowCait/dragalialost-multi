@@ -33,6 +33,55 @@
         body { border-top: 16px solid #ffa100; }
       }
     </style>
+
+    <style>
+      header, main, footer {
+        width: 600px;
+        margin: 0 auto;
+      }
+      footer {
+        margin-top: 20px;
+      }
+      .room-list {
+        list-style-type: none;
+        padding: 0;
+      }
+      .room-list li + li {
+        border-top: solid 1px lightgray;
+      }
+      .room {
+        padding: 1em;
+      }
+      .room h1 {
+        font-size: 1.1em;
+        margin: 0.2em;
+      }
+      .room p {
+        margin: 0.1em;
+      }
+      .room .element {
+        margin-right: 0.2em;
+      }
+      .room.wind .element {
+        color: green;
+      }
+      .room.flame .element {
+        color: red;
+      }
+      .room.water .element {
+        color: blue;
+      }
+      .room.light .element {
+        color: #b7b700;
+      }
+      .room.shadow .element {
+        color: purple;
+      }
+      .created-at {
+        font-size: small;
+        text-align: right;
+      }
+    </style>
   </head>
   <body>
     <!-- <div id="message">
@@ -77,11 +126,12 @@
         <form method="POST" action="/createRoom" class="ajax-form">
           <select name="topic" id="roomTopic"><option>クエスト選択</option></select>
           <input type="number" name="roomId" placeholder="ルームID" />
-          <input type="text" name="note" placeholder="備考" />
+          <input type="text" name="note" maxlength="50" placeholder="備考" />
           <input type="submit" value="ルーム作成" />
         </form>
 
-        <ul id="room-list"></ul>
+        <h2>ルーム一覧</h2>
+        <ul id="room-list" class="room-list"></ul>
         
         <h2>通知を受け取るクエスト</h2>
         <form method="POST" id="subscribeQuests">
@@ -393,7 +443,7 @@
         const groupId = data[0];
         const questId = data[1];
         const level = data[2];
-        let groupName, questName, elementName, levelName;
+        let element, groupName, questName, elementName, levelName;
         levelName = levelsMaster[level];
         questsMaster.some((group) => {
           if (group.id == groupId) {
@@ -401,6 +451,7 @@
             group.quests.some((quest) => {
               if (quest.id == questId) {
                 questName = quest.name;
+                element = quest.element;
                 elementName = elementsMaster[quest.element];
                 return true;
               }
@@ -413,7 +464,7 @@
         const createdAt = new Date(Number(payload.data.createdAt));
 
         // Update the UI to include the received message.
-        appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt);
+        appendMessage(roomId, element, groupName, questName, elementName, levelName, note, createdAt);
 
         // Notification
         showNotification(roomId, groupName, questName, elementName, levelName, note);
@@ -524,26 +575,39 @@
           });
       }
 
-      function appendMessage(roomId, groupName, questName, elementName, levelName, note, createdAt) {
+      function appendMessage(roomId, element, groupName, questName, elementName, levelName, note, createdAt) {
         const ul = document.getElementById('room-list');
         const li = document.createElement('li');
         const article = document.createElement('article');
+        article.classList.add('room');
+        article.classList.add(element);
         const h1 = document.createElement('h1');
+        h1.classList.add('group');
         h1.textContent = groupName;
         article.appendChild(h1);
         const p1 = document.createElement('p');
-        p1.textContent = `${elementName} ${questName} ${levelName}`;
+        const elementSpan = document.createElement('span');
+        elementSpan.classList.add('element');
+        elementSpan.textContent = elementName;
+        p1.appendChild(elementSpan);
+        const questSpan = document.createElement('span');
+        questSpan.textContent = `${questName} ${levelName}`;
+        p1.appendChild(questSpan);
         article.appendChild(p1);
         const p2 = document.createElement('p');
-        p2.textContent = `ルームID: ${roomId}`;
+        p2.classList.add('room-id');
+        p2.textContent = `ルームID: ${hyphenSeparatedRoomId(roomId)}`;
         article.appendChild(p2);
         if (note) {
           const p3 = document.createElement('p');
+          p3.classList.add('note');
           p3.textContent = `備考: ${note}`;
           article.appendChild(p3);
         }
         const p4 = document.createElement('p');
-        p4.textContent = `登録: ${createdAt.toLocaleString()}`
+        p4.classList.add('created-at');
+        const createdAtString = createdAt.toLocaleString();
+        p4.textContent = createdAtString.substring(5, createdAtString.length - 3).replace('-', '/');
         article.appendChild(p4);
         li.appendChild(article);
         ul.insertBefore(li, ul.firstChild);
@@ -555,6 +619,10 @@
           body: `${groupName}\n${elementName} ${questName} ${levelName}`
         };
         new Notification(title, options);
+      }
+
+      function hyphenSeparatedRoomId(id) {
+        return String(id).replace(/(\d)(?=(\d{4})+$)/g, '$1-');
       }
 
 // Test pattern
