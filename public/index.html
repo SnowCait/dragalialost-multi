@@ -610,7 +610,7 @@
         p4.textContent = createdAtString.substring(5, createdAtString.length - 3).replace('-', '/');
         article.appendChild(p4);
         li.appendChild(article);
-        ul.insertBefore(li, ul.firstChild);
+        ul.appendChild(li);
       }
 
       function showNotification(roomId, groupName, questName, elementName, levelName, note) {
