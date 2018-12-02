@@ -46,6 +46,10 @@
         list-style-type: none;
         padding: 0;
       }
+      .room-list:empty::before {
+        display: block;
+        content: '募集があるとここに表示されます。';
+      }
       .room-list li + li {
         border-top: solid 1px lightgray;
       }
