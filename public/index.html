@@ -46,7 +46,7 @@
         list-style-type: none;
         padding: 0;
       }
-      .room-list:empty::before {
+      .room-list#room-list:empty::before {
         display: block;
         content: '募集があるとここに表示されます。';
       }
@@ -136,6 +136,8 @@
           <input type="text" name="note" maxlength="50" placeholder="備考" />
           <input type="submit" value="ルーム作成" />
         </form>
+        
+        <ul id="my-room" class="room-list"></ul>
 
         <h2>ルーム一覧</h2>
         <ul id="room-list" class="room-list"></ul>
@@ -357,7 +359,7 @@
 
       // Variables
       let userToken;
-
+      let myRoom = null;
 
       document.addEventListener('DOMContentLoaded', function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
@@ -383,12 +385,39 @@
         document.getElementById('enable-push-messaging').addEventListener('click', requestPermission);
         document.getElementById('create-room').addEventListener('submit', function(event) {  // アロー関数だと this を取得できない
           event.preventDefault();
-          sendRequest({
+
+          if (myRoom) {
+            // TODO: 〆機能作成（リクエストを送って全ユーザーのルーム一覧から消す）
+            const list = document.getElementById('my-room');
+            while (list.firstChild) {
+              list.removeChild(list.firstChild);
+            }
+          }
+
+          myRoom = new Room(
+            this.roomId.value,
+            this.topic.value,
+            this.note.value,
+            Date.now(),
+            questsMaster,
+            levelsMaster
+          );
+
+          const settings = {
             method: this.method,
             url: this.action,
             data: $(this).serialize(),
             dataType: 'text'
-          });
+          };
+          console.log('Sending request.', settings);
+          $.ajax(settings)
+            .then((data) => {
+              console.log('Request success.', data, myRoom);
+              appendMessage('my-room', myRoom);
+            })
+            .catch((error) => {
+              console.error('Request failed.', error);
+            });
         });
         
         const tableOfQuestGroups = document.getElementById('subscribeQuests').getElementsByTagName('table').item(0);
@@ -507,7 +536,7 @@
           levelsMaster
         );
 
-        appendMessage(room);
+        appendMessage('room-list', room);
         showNotification(room);
       }
 
@@ -616,8 +645,8 @@
           });
       }
 
-      function appendMessage(room) {
-        const ul = document.getElementById('room-list');
+      function appendMessage(id, room) {
+        const ul = document.getElementById(id);
         const li = document.createElement('li');
         const article = document.createElement('article');
         article.classList.add('room');
