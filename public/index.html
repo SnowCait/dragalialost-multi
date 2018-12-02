@@ -413,7 +413,7 @@
           $.ajax(settings)
             .then((data) => {
               console.log('Request success.', data, myRoom);
-              appendMessage('my-room', myRoom);
+              appendRoom('my-room', myRoom);
             })
             .catch((error) => {
               console.error('Request failed.', error);
@@ -536,7 +536,7 @@
           levelsMaster
         );
 
-        appendMessage('room-list', room);
+        appendRoom('room-list', room);
         showNotification(room);
       }
 
@@ -645,7 +645,7 @@
           });
       }
 
-      function appendMessage(id, room) {
+      function appendRoom(id, room) {
         const ul = document.getElementById(id);
         const li = document.createElement('li');
         const article = document.createElement('article');
