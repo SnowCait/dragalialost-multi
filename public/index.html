@@ -130,7 +130,7 @@
       
       <section id="contents" hidden>
         <h2>募集する</h2>
-        <form method="POST" action="/createRoom" class="ajax-form">
+        <form method="POST" action="/createRoom" id="create-room">
           <select name="topic" id="roomTopic"><option>クエスト選択</option></select>
           <input type="number" name="roomId" placeholder="ルームID" />
           <input type="text" name="note" maxlength="50" placeholder="備考" />
@@ -381,16 +381,13 @@
         
         /// UI
         document.getElementById('enable-push-messaging').addEventListener('click', requestPermission);
-        document.querySelectorAll('.ajax-form').forEach((form) => {
-          form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const $form = $(form);
-            sendRequest({
-              method: form.method,
-              url: form.action,
-              data: $form.serialize(),
-              dataType: 'text'
-            });
+        document.getElementById('create-room').addEventListener('submit', function(event) {  // アロー関数だと this を取得できない
+          event.preventDefault();
+          sendRequest({
+            method: this.method,
+            url: this.action,
+            data: $(this).serialize(),
+            dataType: 'text'
           });
         });
         
