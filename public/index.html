@@ -326,6 +326,35 @@
         }
       ];
 
+      // Classes
+      class Room {
+        constructor(roomId, topic, note, createdAt, questsMaster, levelsMaster) {
+          this.id = roomId;
+          this.topic = topic;
+          const data = topic.split('-');
+          this.groupId = data[0];
+          this.questId = data[1];
+          this.level = data[2];
+          this.note = note;
+          this.createdAt = new Date(Number(createdAt));
+          this.levelName = levelsMaster[this.level];
+          questsMaster.some((group) => {
+            if (group.id == this.groupId) {
+              this.groupName = group.name;
+              group.quests.some((quest) => {
+                if (quest.id == this.questId) {
+                  this.questName = quest.name;
+                  this.element = quest.element;
+                  this.elementName = elementsMaster[quest.element];
+                  return true;
+                }
+              });
+              return true;
+            }
+          });
+        }
+      }
+
       // Variables
       let userToken;
 
@@ -472,35 +501,17 @@
       });
 
       function receiveMessage(payload) {
-        const data = payload.data.topic.split('-');
-        const groupId = data[0];
-        const questId = data[1];
-        const level = data[2];
-        let element, groupName, questName, elementName, levelName;
-        levelName = levelsMaster[level];
-        questsMaster.some((group) => {
-          if (group.id == groupId) {
-            groupName = group.name;
-            group.quests.some((quest) => {
-              if (quest.id == questId) {
-                questName = quest.name;
-                element = quest.element;
-                elementName = elementsMaster[quest.element];
-                return true;
-              }
-            });
-            return true;
-          }
-        });
-        const note = payload.data.note;
-        const roomId = payload.data.roomId;
-        const createdAt = new Date(Number(payload.data.createdAt));
+        const room = new Room(
+          payload.data.roomId,
+          payload.data.topic,
+          payload.data.note,
+          payload.data.createdAt,
+          questsMaster,
+          levelsMaster
+        );
 
-        // Update the UI to include the received message.
-        appendMessage(roomId, element, groupName, questName, elementName, levelName, note, createdAt);
-
-        // Notification
-        showNotification(roomId, groupName, questName, elementName, levelName, note);
+        appendMessage(room);
+        showNotification(room);
       }
 
       function sendRequest(settings) {
@@ -608,48 +619,48 @@
           });
       }
 
-      function appendMessage(roomId, element, groupName, questName, elementName, levelName, note, createdAt) {
+      function appendMessage(room) {
         const ul = document.getElementById('room-list');
         const li = document.createElement('li');
         const article = document.createElement('article');
         article.classList.add('room');
-        article.classList.add(element);
+        article.classList.add(room.element);
         const h1 = document.createElement('h1');
         h1.classList.add('group');
-        h1.textContent = groupName;
+        h1.textContent = room.groupName;
         article.appendChild(h1);
         const p1 = document.createElement('p');
         const elementSpan = document.createElement('span');
         elementSpan.classList.add('element');
-        elementSpan.textContent = elementName;
+        elementSpan.textContent = room.elementName;
         p1.appendChild(elementSpan);
         const questSpan = document.createElement('span');
-        questSpan.textContent = `${questName} ${levelName}`;
+        questSpan.textContent = `${room.questName} ${room.levelName}`;
         p1.appendChild(questSpan);
         article.appendChild(p1);
         const p2 = document.createElement('p');
         p2.classList.add('room-id');
-        p2.textContent = `ルームID: ${hyphenSeparatedRoomId(roomId)}`;
+        p2.textContent = `ルームID: ${hyphenSeparatedRoomId(room.id)}`;
         article.appendChild(p2);
-        if (note) {
+        if (room.note) {
           const p3 = document.createElement('p');
           p3.classList.add('note');
-          p3.textContent = `備考: ${note}`;
+          p3.textContent = `備考: ${room.note}`;
           article.appendChild(p3);
         }
         const p4 = document.createElement('p');
         p4.classList.add('created-at');
-        const createdAtString = createdAt.toLocaleString();
+        const createdAtString = room.createdAt.toLocaleString();
         p4.textContent = createdAtString.substring(5, createdAtString.length - 3).replace('-', '/');
         article.appendChild(p4);
         li.appendChild(article);
         ul.appendChild(li);
       }
 
-      function showNotification(roomId, groupName, questName, elementName, levelName, note) {
+      function showNotification(room) {
         var title = 'ドラガリマルチ募集';
         var options = {
-          body: `${groupName}\n${elementName} ${questName} ${levelName}`
+          body: `${room.groupName}\n${room.elementName} ${room.questName} ${room.levelName}`
         };
         new Notification(title, options);
       }
