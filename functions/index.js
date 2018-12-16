@@ -24,11 +24,17 @@ function requestAsync(options) {
 // できれば admin から取得したい
 const serverKey = '';
 
+const { elementsMaster, levelsMaster, questsMaster } = require('../public/assets/master');
+const Room = require('../public/room');
+const helper = require('../public/helper');
+const Twitter = require('twitter');
+
 exports.createRoom = functions.https.onRequest((req, res) => {
   console.log('Requested.', req.url, req.body);
   const topic = req.body.topic;
   const roomId = req.body.roomId;
   const note = req.body.note;
+  const createdAt = Date.now();
 
   // Validation
   if (!topic || !roomId) {
@@ -44,7 +50,7 @@ exports.createRoom = functions.https.onRequest((req, res) => {
       topic: topic,
       roomId: `${roomId}`,
       note: note,
-      createdAt: `${Date.now()}`
+      createdAt: `${createdAt}`
     },
     topic: topic
   };
@@ -55,6 +61,27 @@ exports.createRoom = functions.https.onRequest((req, res) => {
   })
   .catch((error) => {
     console.error('Failed to send message.', error);
+  });
+
+  // Tweet （できれば別の Function にするか async メソッドに切り分けて fire&forget したい）
+  const room = new Room(roomId, topic, note, createdAt, questsMaster, levelsMaster, elementsMaster);
+  const twitterClient = new Twitter({
+    consumer_key: functions.config().twitter.consumer_key,
+    consumer_secret: functions.config().twitter.consumer_secret,
+    access_token_key: functions.config().twitter.access_token,
+    access_token_secret: functions.config().twitter.access_token_secret
+  });
+  let tweetText = `${room.questName}（${room.levelName}）の募集があるみたいですよ\n${helper.hyphenSeparatedRoomId(room.id)}`;
+  if (room.note) {
+    tweetText += `\n${room.note}`;
+  }
+  tweetText += `\nhttps://dragalialost-multi.firebaseapp.com/\n#ドラガリ #ドラガリマルチ`;
+  twitterClient.post('statuses/update', { status: tweetText }, function(error, tweet, response) {
+    if (error) {
+      throw error;
+    }
+    console.log('tweet', tweet);
+    console.log('response', response);
   });
   
   return res.status(200).end();
