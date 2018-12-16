@@ -340,6 +340,16 @@
         }
       }
 
+      class UI
+      {
+        static showContents(enableInput = true) {
+          document.querySelectorAll('#contents input, #contents select').forEach((element, key, parent) => {
+            element.disabled = !enableInput;
+          });
+          document.getElementById('contents').hidden = false;
+        }
+      }
+
       // Variables
       let userToken;
       let myRoom = null;
@@ -537,6 +547,8 @@
               console.error('An error occurred while requesting permission.', err);
               break;
           }
+
+          UI.showContents(false);
         });
       }
 
@@ -587,12 +599,16 @@
               });
               userToken = token;
 
+              UI.showContents(true);
+
               retrieveSubscribingQuest();
             } else {
               // Show permission request.
               console.log('No Instance ID token available. Request permission to generate one.');
               // Show permission UI.
               document.getElementById('requestPermission').hidden = false;
+
+              UI.showContents(false);
             }
           })
           .catch(function (err) {
@@ -606,6 +622,8 @@
               console.error('An error occurred while retrieving token.', err);
               document.getElementById('requestPermission').hidden = true;
             }
+
+            UI.showContents(false);
           });
       }
 
