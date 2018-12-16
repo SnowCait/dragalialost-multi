@@ -96,7 +96,7 @@
 
       <section id="requestPermission" hidden>
         <h2>始めに</h2>
-        <p>ブラウザの通知を有効にする必要があります。</p>
+        <p>ブラウザの通知を有効にすると使えるようになります。</p>
         <button id="enable-push-messaging" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
           通知を有効にする
         </button>
@@ -350,7 +350,9 @@
           document.querySelectorAll('#contents input, #contents select').forEach((element, key, parent) => {
             element.disabled = !enableInput;
           });
-          document.getElementById('contents').hidden = false;
+          let contents = document.getElementById('contents')
+          contents.hidden = false;
+          contents.style.color = enableInput ? 'black' : 'gray';
         }
       }
 
