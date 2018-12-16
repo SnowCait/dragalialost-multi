@@ -140,36 +140,9 @@
     </footer>
 
     <script src="assets/master.js"></script>
+    <script src="room.js"></script>
     <script>
       // Classes
-      class Room {
-        constructor(roomId, topic, note, createdAt, questsMaster, levelsMaster) {
-          this.id = roomId;
-          this.topic = topic;
-          const data = topic.split('-');
-          this.groupId = data[0];
-          this.questId = data[1];
-          this.level = data[2];
-          this.note = note;
-          this.createdAt = new Date(Number(createdAt));
-          this.levelName = levelsMaster[this.level];
-          questsMaster.some((group) => {
-            if (group.id == this.groupId) {
-              this.groupName = group.name;
-              group.quests.some((quest) => {
-                if (quest.id == this.questId) {
-                  this.questName = quest.name;
-                  this.element = quest.element;
-                  this.elementName = elementsMaster[quest.element];
-                  return true;
-                }
-              });
-              return true;
-            }
-          });
-        }
-      }
-
       class UI
       {
         static showContents(enableInput = true) {
@@ -206,7 +179,8 @@
             this.note.value,
             Date.now(),
             questsMaster,
-            levelsMaster
+            levelsMaster,
+            elementsMaster
           );
 
           const settings = {
@@ -339,7 +313,8 @@
           payload.data.note,
           payload.data.createdAt,
           questsMaster,
-          levelsMaster
+          levelsMaster,
+          elementsMaster
         );
 
         appendRoom('room-list', room);
