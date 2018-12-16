@@ -29,5 +29,5 @@ class Room {
 }
 
 if (typeof(exports) !== 'undefined') {
-    exports = Room;
+    module.exports = Room;
 }
