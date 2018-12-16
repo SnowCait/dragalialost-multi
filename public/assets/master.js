@@ -1,3 +1,5 @@
+'use strict'
+
 // Master Data
 const elementsMaster = {
   flame: '火',
