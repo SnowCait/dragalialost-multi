@@ -542,7 +542,8 @@
         .catch(function (err) {
           switch(err.code) {
             case 'messaging/permission-default':
-            case 'messaging/notifications-blocked':
+            case 'messaging/permission-blocked':
+            case 'messaging/notifications-blocked':  // notifications-blocked -> permission-blocked に変わった？
               console.log('Unable to get permission to notify.', err);
               console.log(err.message);
               console.warn('Please permit Notification.');
@@ -551,6 +552,7 @@
               break;
             default:
               console.error('An error occurred while requesting permission.', err);
+              alert('不明なエラー。作者へ連絡をください。');
               break;
           }
 
