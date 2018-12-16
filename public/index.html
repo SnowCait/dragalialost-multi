@@ -141,6 +141,7 @@
 
     <script src="assets/master.js"></script>
     <script src="room.js"></script>
+    <script src="helper.js"></script>
     <script>
       // Classes
       class UI
@@ -480,10 +481,6 @@
           body: `${room.groupName}\n${room.elementName} ${room.questName} ${room.levelName}`
         };
         new Notification(title, options);
-      }
-
-      function hyphenSeparatedRoomId(id) {
-        return String(id).replace(/(\d)(?=(\d{4})+$)/g, '$1-');
       }
     </script>
   </body>
