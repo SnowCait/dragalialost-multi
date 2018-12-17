@@ -24,9 +24,9 @@ function requestAsync(options) {
 // できれば admin から取得したい
 const serverKey = '';
 
-const { elementsMaster, levelsMaster, questsMaster } = require('../public/assets/master');
-const Room = require('../public/room');
-const helper = require('../public/helper');
+const { elementsMaster, levelsMaster, questsMaster } = require('./assets/master');
+const Room = require('./room');
+const helper = require('./helper');
 const Twitter = require('twitter');
 
 exports.createRoom = functions.https.onRequest((req, res) => {
